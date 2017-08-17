@@ -55,7 +55,7 @@
 % my $count = $Values->Count;
 % next if $HideEmpty and not $count;
 % my $CustomFieldName = $CustomField->Name;
-%# The following line ensures invalid characters are removed (supports world languages).
+%#The following substitution replaces all non-ID_Continue characters with a dash character. The ID_Continue Unicode property was chosen because it (combined with ID_Start) is meant for variable names. ID_Continue includes characters suitable for use in CSS-class names (even non-Latin ones, to support non-English custom field names) and excludes syntactic characters that are not (such as whitespace characters).
 % $CustomFieldName =~ s/\P{ID_Continue}+/-/g;
 % my @classes = (
 %   'custom-field',
