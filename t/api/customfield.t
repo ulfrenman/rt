@@ -402,7 +402,7 @@ foreach my $i (2..5) {
     $ocf = RT::ObjectCustomField->new( RT->SystemUser );
     ( $ok, $msg ) = $ocf->LoadByCols( CustomField => $cf->id, ObjectId => 0 );
     ok( $ok, "Found OCF " . $ocf->Id);
-    is( $ocf->SortOrder, $i, "Sort order is $i for OCF " . $ocf->Id);
+    is( $ocf->SortOrder, ($i + 2), "Sort order is " . ($i + 2) . " for OCF " . $ocf->Id);
 }
 
 diag 'Disable TestingCF4';
@@ -417,19 +417,18 @@ $cf->LoadByName(Name => 'TestingCF5', Queue => 0 );
 $ocf = RT::ObjectCustomField->new( RT->SystemUser );
 ( $ok, $msg ) = $ocf->LoadByCols( CustomField => $cf->id, ObjectId => 0 );
 ok( $ok, "Found OCF " . $ocf->Id . " for " . $cf->Name );
-is( $ocf->SortOrder, 5, 'Sort order before MoveUp');
+is( $ocf->SortOrder, 7, 'Sort order before MoveUp');
 $ocf->MoveUp;
-is( $ocf->SortOrder, 3, 'Sort order after MoveUp');
+is( $ocf->SortOrder, 5, 'Sort order after MoveUp');
 
 $cf = RT::CustomField->new( RT->SystemUser );
 $cf->LoadByName(Name => 'TestingCF3', Queue => 0 );
 $ocf = RT::ObjectCustomField->new( RT->SystemUser );
 ( $ok, $msg ) = $ocf->LoadByCols( CustomField => $cf->id, ObjectId => 0 );
 ok( $ok, "Found OCF " . $ocf->Id . " for " . $cf->Name );
-is( $ocf->SortOrder, 4, 'Sort order is 4 for OCF ' . $ocf->Id);
+is( $ocf->SortOrder, 6, 'Sort order is 6 for OCF ' . $ocf->Id);
 
-
-# Sort order should become 5 when re-enabled and not stay at 4
+# Sort order should become 7 when re-enabled and not stay at 6
 $cf = RT::CustomField->new( RT->SystemUser );
 $cf->LoadByName(Name => 'TestingCF4', Queue => 0 );
 ($ok, $msg) = $cf->SetDisabled(0);
@@ -437,6 +436,6 @@ ok($ok, "Re-enabled " . $cf->Name);
 $ocf = RT::ObjectCustomField->new( RT->SystemUser );
 ( $ok, $msg ) = $ocf->LoadByCols( CustomField => $cf->id, ObjectId => 0 );
 ok( $ok, "Found OCF for " . $cf->Name );
-is( $ocf->SortOrder, 5, 'Sort order is 5, CF moved to bottom of list on re-enable');
+is( $ocf->SortOrder, 7, 'Sort order is 7, CF moved to bottom of list on re-enable');
 
 done_testing;
