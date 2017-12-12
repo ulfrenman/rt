@@ -3,7 +3,7 @@ use warnings;
 use HTTP::Request::Common;
 use HTTP::Cookies;
 use LWP;
-use RT::Test tests => 70;
+use RT::Test test => undef;
 
 my $cookie_jar = HTTP::Cookies->new;
 my ($baseurl, $agent) = RT::Test->started_ok;
@@ -219,6 +219,7 @@ diag "click advanced, enter 'C1 OR ( C2 AND C3 )', apply, aggregators should sta
         "no changes, no duplicate condition with badly encoded text"
     );
 
+   $cf->SetDisabled(1);
 }
 
 diag "input a condition, select (several conditions), click delete";
@@ -323,4 +324,78 @@ diag "make sure skipped order by field doesn't break search";
         text      => $t->id,
         url_regex => qr{/Ticket/Display\.html},
     ), "link to the ticket" );
+}
+
+diag "make sure the list of columns available in the 'Order by' dropdowns are complete";
+{
+    $agent->get_ok($url.'Search/Build.html');
+
+    my @orderby = qw(
+        AdminCc.EmailAddress
+        Cc.EmailAddress
+        Created
+        Creator
+        Custom.Ownership
+        Due
+        FinalPriority
+        InitialPriority
+        LastUpdated
+        LastUpdatedBy
+        Owner
+        Priority
+        Queue
+        Requestor.EmailAddress
+        Resolved
+        SLA
+        Started
+        Starts
+        Status
+        Subject
+        TimeEstimated
+        TimeLeft
+        TimeWorked
+        Told
+        Type
+        id
+    );
+
+    my $orderby = join(' ', sort @orderby);
+
+    my @scraped_orderbys = $agent->scrape_text_by_attr('name', 'OrderBy');
+
+    for my $idx (0..@scraped_orderbys-1) {
+        if ($idx == 0) {
+            is ($scraped_orderbys[$idx], $orderby);
+        } else {
+            is ($scraped_orderbys[$idx], '[none] '.$orderby);
+        }
+    }
+    
+    my $cf = RT::Test->load_or_create_custom_field(
+        Name  => 'Location',
+        Queue => 'General',
+        Type  => 'FreeformSingle', );
+    isa_ok( $cf, 'RT::CustomField' );
+
+    ok($agent->form_name('BuildQuery'), "found the form");
+    $agent->field("SavedSearchId" => "new");
+    $agent->field("ValueOfQueue", "General");
+    $agent->field("AddClause", "Add these termes");
+    $agent->submit;
+
+    push @orderby, 'CustomField.{Location}';
+
+    $orderby = join(' ', sort @orderby);
+
+    @scraped_orderbys = $agent->scrape_text_by_attr('name', 'OrderBy');
+
+    for my $idx (0..@scraped_orderbys-1) {
+        if ($idx == 0) {
+            is ($scraped_orderbys[$idx], $orderby);
+        } else {
+            is ($scraped_orderbys[$idx], '[none] '.$orderby);
+        }
+    }
+
+    $cf->SetDisabled(1);
 }
