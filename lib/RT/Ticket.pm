@@ -239,6 +239,7 @@ sub Create {
         SLA                => undef,
         MIMEObj            => undef,
         _RecordTransaction => 1,
+        ArticleIncluded    => undef,
         @_
     );
 
@@ -278,6 +279,16 @@ sub Create {
     my $cycle = $QueueObj->LifecycleObj;
     unless ( defined $args{'Status'} && length $args{'Status'} ) {
         $args{'Status'} = $cycle->DefaultOnCreate;
+    }
+
+    if ( $QueueObj->ArticleIncluded ) {
+        my $MyArticle = RT::Article->new(RT->SystemUser);
+        my $ObjectCustomFieldValue = RT::ObjectCustomFieldValue->new(RT->SystemUser);
+        my $MIMEObj = $args{'MIMEObj'};
+        $MyArticle->LoadByCols(Name => $QueueObj->ArticleIncluded);
+        $ObjectCustomFieldValue->LoadByCols(ObjectId => $MyArticle->id);
+        my $ArticleContent = MIME::Entity->build( Type => "text/plain" , Data => $ObjectCustomFieldValue->Content() );
+        $MIMEObj->add_part($ArticleContent);
     }
 
     $args{'Status'} = lc $args{'Status'};

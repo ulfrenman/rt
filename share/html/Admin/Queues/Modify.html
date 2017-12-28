@@ -80,6 +80,10 @@
 % }
 </td></tr>
 
+<tr><td align="right"><&|/l&>Include Article</&>:</td>
+  <td colspan="3"><input name="ArticleIncluded" value="<% $ARGS{'ArticleIncluded'} || ($Create ? "" : $QueueObj->ArticleIncluded || '' ) %>" size="20"/></td>
+</tr>
+
 <tr><td align="right"><&|/l&>Subject Tag</&>:</td>
 <td colspan="3"><input name="SubjectTag" value="<% $ARGS{'SubjectTag'} || ($Create ? "" : $QueueObj->SubjectTag || '' ) %>" size="60" /></td>
 </tr>
@@ -185,11 +189,10 @@ unless ($Create) {
         $QueueObj->Load($id) || $QueueObj->Load($Name) || Abort(loc("Couldn't load queue '[_1]'", $Name));
     }
 }
-
 if ( $QueueObj->Id ) {
     $title = loc('Configuration for queue [_1]', $QueueObj->Name );
     my @attribs= qw(Description CorrespondAddress CommentAddress Name SortOrder
-        Sign SignAuto Encrypt Lifecycle SubjectTag SLADisabled Disabled);
+        Sign SignAuto Encrypt Lifecycle ArticleIncluded SubjectTag SLADisabled Disabled);
 
     # we're asking about enabled on the web page but really care about disabled
     if ( $SetEnabled ) {
@@ -215,7 +218,6 @@ if ( $QueueObj->Id ) {
         Object => $QueueObj,
         ARGSRef => \%ARGS
     );
-
     $Disabled = $ARGS{'Disabled'} = $Enabled? 0: 1;
 
     $EnabledChecked = "" if $QueueObj->Disabled;
@@ -264,6 +266,7 @@ $Description => undef
 $CorrespondAddress => undef
 $CommentAddress => undef
 $SetSLAEnabled => undef
+$ArticleIncluded => undef
 $SetEnabled => undef
 $SetCrypt => undef
 $SLAEnabled => undef
