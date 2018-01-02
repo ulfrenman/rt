@@ -80,8 +80,13 @@
 % }
 </td></tr>
 
-<tr><td align="right"><&|/l&>Include Article</&>:</td>
-  <td colspan="3"><input name="ArticleIncluded" value="<% $ARGS{'ArticleIncluded'} || ($Create ? "" : $QueueObj->ArticleIncluded || '' ) %>" size="20"/></td>
+<td><&|/l&>Include Article:</&></td>
+<td><select name="ArticleIncluded">
+    <option value="<% $ARGS{'ArticleInclduded'} || ($Create ? "" : $QueueObj->ArticleIncluded || '') %>"><% $ARGS{'ArticleIncluded'} || ($QueueObj->ArticleIncluded || '-') %></option>
+% while (my $article = $hotlist->Next) {
+<option value="<% $article->Name %>"><% $article->Name %></option>
+% }
+</select>
 </tr>
 
 <tr><td align="right"><&|/l&>Subject Tag</&>:</td>
@@ -175,6 +180,10 @@ checked="checked"
 my ($title, @results, @no_redirect_results, $Disabled, $EnabledChecked);
 my $QueueObj = RT::Queue->new( $session{'CurrentUser'} );
 $QueueObj->Load( $id ) if !$id || $id eq 'new';
+
+my $hotlist = RT::Articles->new( $session{'CurrentUser'});
+$hotlist->LimitHotlistClasses;
+$hotlist->LimitAppliedClasses ( Queue => $QueueObj );
 
 $EnabledChecked = 'checked="checked"';
 
