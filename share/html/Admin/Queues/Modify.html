@@ -83,6 +83,7 @@
 <td><&|/l&>Include Article:</&></td>
 <td><select name="ArticleIncluded">
     <option value="<% $ARGS{'ArticleInclduded'} || ($Create ? "" : $QueueObj->ArticleIncluded || '') %>"><% $ARGS{'ArticleIncluded'} || ($QueueObj->ArticleIncluded || '-') %></option>
+<option value="">-</option>
 % while (my $article = $hotlist->Next) {
 <option value="<% $article->Name %>"><% $article->Name %></option>
 % }
