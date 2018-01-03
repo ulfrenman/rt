@@ -942,6 +942,11 @@ The ID value of the article will be loaded from the name, and used to get the ar
 ==head2 SetArticleIncluded
 
 Takes a name value and sets the ArticleIncluded attr for the queue to that name.
+Can also set the article to be included in RT_SiteConfig.pm:
+    Set(%ArticleIncluded,
+        'MyQueue'   =>  'MyArticle',
+        'General'   =>  'General Info'
+    );
 
 =head2 SubjectTag
 

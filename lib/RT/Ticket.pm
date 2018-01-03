@@ -281,11 +281,15 @@ sub Create {
         $args{'Status'} = $cycle->DefaultOnCreate;
     }
 
-    if ( $QueueObj->ArticleIncluded ) {
+    my %config = RT->Config->Get('ArticleIncluded');
+    if ( $QueueObj->ArticleIncluded || exists($config{$QueueObj->Name})) {
         my $MyArticle = RT::Article->new(RT->SystemUser);
+        if ( $MyArticle->ValidateName($config{$QueueObj->Name}) and $config{$QueueObj->Name} ) {
+            return (0, 0, "Invalid Article Name: $config{$QueueObj->Name}, check your RT_SiteConfig.pm");
+        }
         my $ObjectCustomFieldValue = RT::ObjectCustomFieldValue->new(RT->SystemUser);
         my $MIMEObj = $args{'MIMEObj'};
-        $MyArticle->LoadByCols(Name => $QueueObj->ArticleIncluded);
+        $MyArticle->LoadByCols(Name => $QueueObj->ArticleIncluded ? $QueueObj->ArticleIncluded : $config{$QueueObj->Name} );
         $ObjectCustomFieldValue->LoadByCols(ObjectId => $MyArticle->id);
         my $ArticleContent = MIME::Entity->build( Type => "text/plain" , Data => $ObjectCustomFieldValue->Content() );
         $MIMEObj->add_part($ArticleContent);
