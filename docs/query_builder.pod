@@ -27,6 +27,11 @@ src="images/search-criteria.png">
 
 =for :man [Search Criteria F<docs/images/search-criteria.png>]
 
+RT also has two meta-statuses, 'active' and 'inactive'. By selecting either of
+these from the status dropdown of the query builder, you will no longer need
+to explicitly list all of the active or inactive statuses or manually enter
+the queries: "Status = '__Active__'" or "Status = '__Inactive__'".
+
 Now that I've selected some criteria, I can click either Add These Terms or
 Add These Terms and Search. I'll click the former:
 
